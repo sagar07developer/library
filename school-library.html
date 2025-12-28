@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>School Library Book Register</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --primary: #4b6fff;
+      --primary-dark: #354ad0;
+      --accent: #fbbc04;
+      --bg: #f5f7fb;
+      --card-bg: #ffffff;
+      --border: #d9deea;
+      --text-main: #1f2532;
+      --text-muted: #6b7280;
+      --danger: #ef4444;
+      --success: #16a34a;
+      --radius-lg: 10px;
+      --radius-md: 6px;
+      --shadow-soft: 0 10px 25px rgba(15, 23, 42, 0.08);
+      --transition-fast: 0.18s ease-out;
+      --input-height: 34px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #eef2ff, #f9fafb 45%, #e0f2fe);
+      color: var(--text-main);
+    }
+
+    .app-shell {
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 0 16px 32px;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .title-block h1 {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: 0.03em;
+    }
+
+    .title-block p {
+      margin: 4px 0 0;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(79, 70, 229, 0.06);
+      color: var(--primary-dark);
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .tabs {
+      display: inline-flex;
+      padding: 3px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.04);
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08) inset;
+    }
+
+    .tab-btn {
+      border: none;
+      background: transparent;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background var(--transition-fast), color var(--transition-fast),
+        transform var(--transition-fast);
+    }
+
+    .tab-btn span.icon {
+      font-size: 14px;
+    }
+
+    .tab-btn.active {
+      background: #ffffff;
+      color: var(--primary-dark);
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .tab-btn:not(.active):hover {
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.8fr) minmax(260px, 1fr);
+      gap: 18px;
+      align-items: flex-start;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .app-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      padding: 14px 16px 16px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .card-header h2 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #4b5563;
+    }
+
+    .card-header p {
+      margin: 0;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .pill {
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #4f46e5;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .search-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px 10px;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 720px) {
+      .search-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .field label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrap input,
+    .input-wrap select {
+      width: 100%;
+      height: var(--input-height);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      padding: 0 9px 0 26px;
+      font-size: 12px;
+      outline: none;
+      background: #f9fafb;
+      transition: box-shadow var(--transition-fast), border-color var(--transition-fast),
+        background var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .input-wrap input:focus,
+    .input-wrap select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.3);
+      background: #ffffff;
+      transform: translateY(-0.5px);
+    }
+
+    .input-wrap span.icon {
+      position: absolute;
+      left: 7px;
+      font-size: 13px;
+      color: #9ca3af;
+      pointer-events: none;
+    }
+
+    .input-subtext {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    .button-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+      margin-top: 4px;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: none;
+      height: 30px;
+      padding: 0 12px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background var(--transition-fast), box-shadow var(--transition-fast),
+        transform var(--transition-fast), color var(--transition-fast);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #ffffff;
+      box-shadow: 0 8px 18px rgba(79, 70, 229, 0.4);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 10px 22px rgba(55, 65, 194, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #ffffff;
+      color: var(--text-main);
+      border: 1px dashed var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: #f3f4f6;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(148, 163, 184, 0.1);
+    }
+
+    .btn-danger {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .btn-danger:hover {
+      background: #fecaca;
+    }
+
+    .stat-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+      padding-top: 3px;
+      border-top: 1px dashed rgba(148, 163, 184, 0.5);
+      margin-top: 6px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 10px;
+      font-weight: 500;
+    }
+
+    .chip-green {
+      background: #ecfdf3;
+      color: #15803d;
+    }
+
+    .chip-amber {
+      background: #fffbeb;
+      color: #92400e;
+    }
+
+    .chip-gray {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    .table-wrap {
+      max-height: 520px;
+      overflow: auto;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: linear-gradient(135deg, #f9fafb, #ffffff);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      min-width: 900px;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: linear-gradient(135deg, #eef2ff, #e0f2fe);
+    }
+
+    thead th {
+      padding: 8px 8px;
+      text-align: left;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #4b5563;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      transition: background var(--transition-fast), transform var(--transition-fast),
+        box-shadow var(--transition-fast);
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(249, 250, 251, 0.9);
+    }
+
+    tbody tr:hover {
+      background: #eef2ff;
+      transform: translateY(-0.5px);
+      box-shadow: 0 4px 12px rgba(148, 163, 184, 0.45);
+    }
+
+    td {
+      padding: 7px 8px;
+      border-bottom: 1px solid rgba(229, 231, 235, 0.9);
+      vertical-align: top;
+    }
+
+    td span.book-title {
+      font-weight: 600;
+      color: #111827;
+    }
+
+    td span.muted {
+      color: var(--text-muted);
+      font-size: 11px;
+    }
+
+    .nowrap {
+      white-space: nowrap;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 500;
+    }
+
+    .status-available {
+      background: #ecfdf3;
+      color: #15803d;
+    }
+
+    .status-assigned {
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
+    .status-empty {
+      background: #f3f4f6;
+      color: #4b5563;
+    }
+
+    .assistant-panel {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .assistant-panel h3 {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .assistant-panel ul {
+      margin: 0;
+      padding-left: 16px;
+    }
+
+    .assistant-panel li {
+      margin-bottom: 4px;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .tag {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
+    .manage-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.2fr);
+      gap: 16px;
+    }
+    @media (max-width: 900px) {
+      .manage-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px 10px;
+    }
+    .form-grid .field.full {
+      grid-column: 1 / -1;
+    }
+    .form-grid textarea {
+      width: 100%;
+      min-height: 48px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      padding: 6px 9px;
+      font-size: 12px;
+      resize: vertical;
+      background: #f9fafb;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast),
+        background var(--transition-fast);
+    }
+    .form-grid textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.3);
+      background: #ffffff;
+      outline: none;
+    }
+
+    .mini-table-wrap {
+      max-height: 260px;
+      overflow: auto;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: #f9fafb;
+    }
+    .mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      min-width: 400px;
+    }
+    .mini-table th,
+    .mini-table td {
+      padding: 6px 7px;
+      border-bottom: 1px solid rgba(229, 231, 235, 0.9);
+    }
+    .mini-table thead {
+      position: sticky;
+      top: 0;
+      background: #e5e7eb;
+    }
+    .mini-table tbody tr:hover {
+      background: #e0f2fe;
+    }
+    .row-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .btn-xs {
+      height: 22px;
+      padding: 0 8px;
+      border-radius: 999px;
+      border: none;
+      font-size: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-xs-edit {
+      background: #e0f2fe;
+      color: #1d4ed8;
+    }
+    .btn-xs-delete {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .status-bar {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .status-bar span.strong {
+      color: #111827;
+      font-weight: 600;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 18px;
+      right: 18px;
+      padding: 10px 14px;
+      background: #111827;
+      color: #f9fafb;
+      border-radius: 999px;
+      font-size: 11px;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.4);
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+      transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+      z-index: 999;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="app-header">
+    <div class="title-block">
+      <h1>School Library Book Register</h1>
+      <p>Single-file tracker with search and data management for classes, teachers, and library staff.</p>
+      <div class="tag-row">
+        <span class="badge">Local · No server needed</span>
+        <span class="tag">Auto search</span>
+        <span class="tag">Assign to class</span>
+        <span class="tag">Printable list</span>
+      </div>
+    </div>
+    <div>
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="search">
+          <span class="icon">🔎</span><span>Search Books</span>
+        </button>
+        <button class="tab-btn" data-tab="manage">
+          <span class="icon">📚</span><span>Manage Data</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- SEARCH TAB -->
+  <main id="tab-search" class="layout">
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <h2>Search & Filter</h2>
+          <p>Type in any box to instantly narrow down the book list.</p>
+        </div>
+        <span class="pill">Live Search</span>
+      </div>
+
+      <div class="search-grid">
+        <div class="field">
+          <label>Register no</label>
+          <div class="input-wrap">
+            <span class="icon">#</span>
+            <input id="search-register" type="text" placeholder="e.g. REG003" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Author name</label>
+          <div class="input-wrap">
+            <span class="icon">✍</span>
+            <input id="search-author" type="text" placeholder="e.g. Sudha Murty" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Book name</label>
+          <div class="input-wrap">
+            <span class="icon">📖</span>
+            <input id="search-title" type="text" placeholder="e.g. Wings of Fire" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Publication</label>
+          <div class="input-wrap">
+            <span class="icon">🏢</span>
+            <input id="search-pub" type="text" placeholder="e.g. Penguin" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Classification</label>
+          <div class="input-wrap">
+            <span class="icon">🏷</span>
+            <input id="search-classification" type="text" placeholder="e.g. Fiction" />
+          </div>
+          <div class="input-subtext">Use terms like Fiction, Biography, Reference.</div>
+        </div>
+        <div class="field">
+          <label>Assigned to</label>
+          <div class="input-wrap">
+            <span class="icon">👥</span>
+            <input id="search-assigned" type="text" placeholder="e.g. 6A, Library" />
+          </div>
+        </div>
+      </div>
+
+      <div class="button-row">
+        <button class="btn btn-secondary" id="btn-reset-filters">
+          <span>Reset filters</span>
+        </button>
+        <button class="btn btn-ghost" id="btn-print">
+          <span>🖨</span><span>Print / Save PDF</span>
+        </button>
+      </div>
+
+      <div class="table-wrap">
+        <table id="books-table">
+          <thead>
+          <tr>
+            <th>Register no</th>
+            <th>Author name</th>
+            <th>Book Name</th>
+            <th>Publication</th>
+            <th>Page</th>
+            <th>Price</th>
+            <th>Classification</th>
+            <th>Assigned To</th>
+            <th>Remark</th>
+          </tr>
+          </thead>
+          <tbody id="books-tbody">
+          </tbody>
+        </table>
+      </div>
+
+      <div class="stat-row">
+        <div>
+          <span id="result-count">0</span> items shown
+        </div>
+        <div>
+          <span class="chip chip-green" id="count-available">0 available</span>
+          <span class="chip chip-amber" id="count-assigned">0 assigned</span>
+          <span class="chip chip-gray" id="count-total">0 total</span>
+        </div>
+      </div>
+    </section>
+
+    <aside class="card">
+      <div class="assistant-panel">
+        <div>
+          <h3>How to use this sheet</h3>
+          <ul>
+            <li>Type in any search box to narrow down results.</li>
+            <li>Combine fields, e.g. Author + Class, to find specific sets.</li>
+            <li>Use Print to get a class‑wise or shelf‑wise list.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Availability rule</h3>
+          <ul>
+            <li>If Assigned To is blank, book is treated as available.</li>
+            <li>Type keywords like Fiction, Reference, Hindi in Classification.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Editing books</h3>
+          <ul>
+            <li>Switch to Manage Data tab to add or edit books.</li>
+            <li>All records are stored in browser local storage for this computer.</li>
+          </ul>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- MANAGE TAB -->
+  <main id="tab-manage" class="layout" style="display:none;">
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <h2>Manage Books</h2>
+          <p>Add new books or update existing entries.</p>
+        </div>
+      </div>
+
+      <form id="book-form">
+        <input type="hidden" id="edit-index" value="" />
+        <div class="form-grid">
+          <div class="field">
+            <label>Register no *</label>
+            <div class="input-wrap">
+              <span class="icon">#</span>
+              <input id="form-register" type="text" required placeholder="Unique ID e.g. REG006" />
+            </div>
+          </div>
+          <div class="field">
+            <label>Author name *</label>
+            <div class="input-wrap">
+              <span class="icon">✍</span>
+              <input id="form-author" type="text" required placeholder="Author full name" />
+            </div>
+          </div>
+          <div class="field full">
+            <label>Book Name *</label>
+            <div class="input-wrap">
+              <span class="icon">📖</span>
+              <input id="form-title" type="text" required placeholder="Complete book title" />
+            </div>
+          </div>
+          <div class="field">
+            <label>Publication</label>
+            <div class="input-wrap">
+              <span class="icon">🏢</span>
+              <input id="form-pub" type="text" placeholder="Publisher name" />
+            </div>
+          </div>
+          <div class="field">
+            <label>Page</label>
+            <div class="input-wrap">
+              <span class="icon">📄</span>
+              <input id="form-pages" type="number" min="1" step="1" placeholder="e.g. 320" />
+            </div>
+          </div>
+          <div class="field">
+            <label>Price</label>
+            <div class="input-wrap">
+              <span class="icon">₹</span>
+              <input id="form-price" type="number" min="0" step="1" placeholder="e.g. 350" />
+            </div>
+          </div>
+          <div class="field">
+            <label>Classification</label>
+            <div class="input-wrap">
+              <span class="icon">🏷</span>
+              <input id="form-classification" type="text" placeholder="Fiction, Reference, Biography..." />
+            </div>
+          </div>
+          <div class="field">
+            <label>Assigned To</label>
+            <div class="input-wrap">
+              <span class="icon">👥</span>
+              <input id="form-assigned" type="text" placeholder="Class/Student/Library" />
+            </div>
+          </div>
+          <div class="field full">
+            <label>Remark</label>
+            <textarea id="form-remark" placeholder="Condition, shelf number, language, notes..."></textarea>
+          </div>
+        </div>
+
+        <div class="button-row" style="margin-top:10px;">
+          <div style="display:flex; gap:8px;">
+            <button type="submit" class="btn btn-primary">
+              <span>Save book</span>
+            </button>
+            <button type="button" class="btn btn-secondary" id="btn-clear-form">
+              <span>Clear form</span>
+            </button>
+          </div>
+          <button type="button" class="btn btn-ghost" id="btn-load-sample">
+            <span>Reset to demo set</span>
+          </button>
+        </div>
+        <div class="status-bar">
+          <span>Mode: <span class="strong" id="form-mode-label">Add new</span></span>
+          <span>Books stored on this device in local storage.</span>
+        </div>
+      </form>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <h2>Current Book List</h2>
+          <p>Click Edit to load a row into the form or Delete to remove it.</p>
+        </div>
+      </div>
+      <div class="mini-table-wrap">
+        <table class="mini-table">
+          <thead>
+          <tr>
+            <th>Reg no</th>
+            <th>Book</th>
+            <th>Author</th>
+            <th>Assigned</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody id="mini-tbody">
+          </tbody>
+        </table>
+      </div>
+      <div class="status-bar">
+        <span>Total records: <span class="strong" id="mini-total">0</span></span>
+        <span>Changes reflected immediately in Search tab.</span>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+  const STORAGE_KEY = "school_library_books_v1";
+
+  const demoBooks = [
+    {
+      registerNo: "REG001",
+      author: "R. J. Palacio",
+      title: "Wonder",
+      publication: "Penguin",
+      pages: 320,
+      price: 350,
+      classification: "Fiction",
+      remark: "Class 6 library; English; Good condition",
+      assignedTo: "6A"
+    },
+    {
+      registerNo: "REG002",
+      author: "Sudha Murty",
+      title: "Wise and Otherwise",
+      publication: "Penguin",
+      pages: 208,
+      price: 250,
+      classification: "Short Stories",
+      remark: "For teachers; Staff reading shelf",
+      assignedTo: "Staff"
+    },
+    {
+      registerNo: "REG003",
+      author: "A. P. J. Abdul Kalam",
+      title: "Wings of Fire",
+      publication: "Universities Press",
+      pages: 180,
+      price: 300,
+      classification: "Biography",
+      remark: "Popular for projects; Senior wing",
+      assignedTo: "8B"
+    },
+    {
+      registerNo: "REG004",
+      author: "J. K. Rowling",
+      title: "Harry Potter and the Philosopher’s Stone",
+      publication: "Bloomsbury",
+      pages: 350,
+      price: 450,
+      classification: "Fiction",
+      remark: "High demand; Keep behind counter",
+      assignedTo: "Library"
+    },
+    {
+      registerNo: "REG005",
+      author: "Ruskin Bond",
+      title: "The Blue Umbrella",
+      publication: "Rupa",
+      pages: 90,
+      price: 150,
+      classification: "Fiction",
+      remark: "For primary classes; Hindi and English editions",
+      assignedTo: "4C"
+    }
+  ];
+
+  let books = [];
+
+  function loadBooksFromStorage() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      books = [...demoBooks];
+      saveBooksToStorage();
+      return;
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      books = Array.isArray(parsed) ? parsed : [...demoBooks];
+    } catch {
+      books = [...demoBooks];
+    }
+  }
+
+  function saveBooksToStorage() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(books));
+  }
+
+  const toastEl = document.getElementById("toast");
+  let toastTimeout = null;
+  function showToast(message) {
+    toastEl.textContent = message;
+    toastEl.classList.add("show");
+    if (toastTimeout) clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => toastEl.classList.remove("show"), 2200);
+  }
+
+  const tbody = document.getElementById("books-tbody");
+  const countAvailableEl = document.getElementById("count-available");
+  const countAssignedEl = document.getElementById("count-assigned");
+  const countTotalEl = document.getElementById("count-total");
+  const resultCountEl = document.getElementById("result-count");
+
+  const searchInputs = {
+    register: document.getElementById("search-register"),
+    author: document.getElementById("search-author"),
+    title: document.getElementById("search-title"),
+    pub: document.getElementById("search-pub"),
+    classification: document.getElementById("search-classification"),
+    assigned: document.getElementById("search-assigned")
+  };
+
+  function normalize(str) {
+    return (str || "").toString().toLowerCase();
+  }
+
+  function matchesFilter(book, filters) {
+    if (filters.register && !normalize(book.registerNo).includes(filters.register)) return false;
+    if (filters.author && !normalize(book.author).includes(filters.author)) return false;
+    if (filters.title && !normalize(book.title).includes(filters.title)) return false;
+    if (filters.pub && !normalize(book.publication).includes(filters.pub)) return false;
+    if (filters.classification && !normalize(book.classification).includes(filters.classification)) return false;
+    if (filters.assigned && !normalize(book.assignedTo).includes(filters.assigned)) return false;
+    return true;
+  }
+
+  function getActiveFilters() {
+    return {
+      register: normalize(searchInputs.register.value),
+      author: normalize(searchInputs.author.value),
+      title: normalize(searchInputs.title.value),
+      pub: normalize(searchInputs.pub.value),
+      classification: normalize(searchInputs.classification.value),
+      assigned: normalize(searchInputs.assigned.value)
+    };
+  }
+
+  function renderTable() {
+    const filters = getActiveFilters();
+    const rows = [];
+    let availableCount = 0;
+    let assignedCount = 0;
+
+    for (const book of books) {
+      if (!matchesFilter(book, filters)) continue;
+      const assigned = (book.assignedTo || "").trim();
+      const available = assigned === "";
+      if (available) availableCount++;
+      else assignedCount++;
+
+      rows.push(`
+        <tr>
+          <td class="nowrap">
+            <span class="book-title">${book.registerNo || ""}</span><br/>
+            <span class="muted">${available ? "Available" : "Assigned"}</span>
+          </td>
+          <td>${book.author || ""}</td>
+          <td>
+            <span class="book-title">${book.title || ""}</span><br/>
+            <span class="muted">${book.publication || ""}</span>
+          </td>
+          <td>${book.publication || ""}</td>
+          <td class="nowrap">${book.pages || ""}</td>
+          <td class="nowrap">${book.price ? "₹ " + book.price : ""}</td>
+          <td>${book.classification || ""}</td>
+          <td>
+            <span class="status-pill ${assigned ? "status-assigned" : "status-empty"}">
+              ${assigned || "Unassigned"}
+            </span>
+          </td>
+          <td>${book.remark || ""}</td>
+        </tr>
+      `);
+    }
+
+    tbody.innerHTML = rows.join("");
+    const shown = rows.length;
+    const total = books.length;
+    resultCountEl.textContent = shown;
+    countAvailableEl.textContent = `${availableCount} available`;
+    countAssignedEl.textContent = `${assignedCount} assigned`;
+    countTotalEl.textContent = `${total} total`;
+  }
+
+  const miniTbody = document.getElementById("mini-tbody");
+  const miniTotalEl = document.getElementById("mini-total");
+
+  function renderMiniTable() {
+    const rows = books.map((book, idx) => {
+      const assigned = (book.assignedTo || "").trim();
+      const assignedLabel = assigned || "Unassigned";
+      return `
+        <tr>
+          <td>${book.registerNo || ""}</td>
+          <td><span class="book-title">${book.title || ""}</span></td>
+          <td>${book.author || ""}</td>
+          <td>${assignedLabel}</td>
+          <td>
+            <div class="row-actions">
+              <button type="button" class="btn-xs btn-xs-edit" data-edit="${idx}">Edit</button>
+              <button type="button" class="btn-xs btn-xs-delete" data-delete="${idx}">Delete</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    });
+    miniTbody.innerHTML = rows.join("");
+    miniTotalEl.textContent = books.length;
+  }
+
+  miniTbody.addEventListener("click", (e) => {
+    const editIndex = e.target.getAttribute("data-edit");
+    const deleteIndex = e.target.getAttribute("data-delete");
+    if (editIndex !== null) {
+      loadBookIntoForm(parseInt(editIndex, 10));
+    } else if (deleteIndex !== null) {
+      const idx = parseInt(deleteIndex, 10);
+      if (!Number.isNaN(idx) && confirm("Delete this book from the register?")) {
+        books.splice(idx, 1);
+        saveBooksToStorage();
+        renderTable();
+        renderMiniTable();
+        showToast("Book deleted");
+      }
+    }
+  });
+
+  const form = document.getElementById("book-form");
+  const editIndexInput = document.getElementById("edit-index");
+  const modeLabel = document.getElementById("form-mode-label");
+
+  const formFields = {
+    register: document.getElementById("form-register"),
+    author: document.getElementById("form-author"),
+    title: document.getElementById("form-title"),
+    pub: document.getElementById("form-pub"),
+    pages: document.getElementById("form-pages"),
+    price: document.getElementById("form-price"),
+    classification: document.getElementById("form-classification"),
+    assigned: document.getElementById("form-assigned"),
+    remark: document.getElementById("form-remark")
+  };
+
+  function clearForm() {
+    form.reset();
+    editIndexInput.value = "";
+    modeLabel.textContent = "Add new";
+  }
+
+  function loadBookIntoForm(index) {
+    const book = books[index];
+    if (!book) return;
+    formFields.register.value = book.registerNo || "";
+    formFields.author.value = book.author || "";
+    formFields.title.value = book.title || "";
+    formFields.pub.value = book.publication || "";
+    formFields.pages.value = book.pages || "";
+    formFields.price.value = book.price || "";
+    formFields.classification.value = book.classification || "";
+    formFields.assigned.value = book.assignedTo || "";
+    formFields.remark.value = book.remark || "";
+    editIndexInput.value = index;
+    modeLabel.textContent = "Editing #" + book.registerNo;
+    showToast("Loaded for editing");
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const bookData = {
+      registerNo: formFields.register.value.trim(),
+      author: formFields.author.value.trim(),
+      title: formFields.title.value.trim(),
+      publication: formFields.pub.value.trim(),
+      pages: formFields.pages.value ? parseInt(formFields.pages.value, 10) : "",
+      price: formFields.price.value ? parseFloat(formFields.price.value) : "",
+      classification: formFields.classification.value.trim(),
+      assignedTo: formFields.assigned.value.trim(),
+      remark: formFields.remark.value.trim()
+    };
+
+    if (!bookData.registerNo || !bookData.author || !bookData.title) {
+      alert("Please fill in Register no, Author, and Book Name.");
+      return;
+    }
+
+    const editIndex = editIndexInput.value;
+    if (editIndex !== "") {
+      books[parseInt(editIndex, 10)] = bookData;
+      showToast("Book updated");
+    } else {
+      books.push(bookData);
+      showToast("Book added");
+    }
+    saveBooksToStorage();
+    renderTable();
+    renderMiniTable();
+    clearForm();
+  });
+
+  document.getElementById("btn-clear-form").addEventListener("click", clearForm);
+
+  document.getElementById("btn-load-sample").addEventListener("click", () => {
+    if (!confirm("Replace current data with demo sample set?")) return;
+    books = [...demoBooks];
+    saveBooksToStorage();
+    renderTable();
+    renderMiniTable();
+    clearForm();
+    showToast("Demo set loaded");
+  });
+
+  Object.values(searchInputs).forEach((input) => {
+    input.addEventListener("input", renderTable);
+  });
+
+  document.getElementById("btn-reset-filters").addEventListener("click", () => {
+    Object.values(searchInputs).forEach((input) => { input.value = ""; });
+    renderTable();
+  });
+
+  document.getElementById("btn-print").addEventListener("click", () => {
+    window.print();
+  });
+
+  const tabButtons = document.querySelectorAll(".tab-btn");
+  const tabSearch = document.getElementById("tab-search");
+  const tabManage = document.getElementById("tab-manage");
+
+  tabButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const tab = btn.getAttribute("data-tab");
+      tabButtons.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      if (tab === "search") {
+        tabSearch.style.display = "grid";
+        tabManage.style.display = "none";
+      } else {
+        tabSearch.style.display = "none";
+        tabManage.style.display = "grid";
+      }
+    });
+  });
+
+  loadBooksFromStorage();
+  renderTable();
+  renderMiniTable();
+</script>
+</body>
+</html>
